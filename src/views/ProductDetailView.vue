@@ -4,7 +4,7 @@
     <div class="product-info">
       <h1>{{ product.name }}</h1>
       <p class="price">{{ formatPrice(product.price) }}</p>
-      <p class="description">{{ product.description }}</p>
+      <div class="description" v-html="product.description"></div>
       <button @click="addToCart" class="add-to-cart-button">Add to Cart</button>
     </div>
   </div>
@@ -77,11 +77,20 @@ export default defineComponent({
   font-size: 1.5rem;
   font-weight: bold;
   color: #4a4a4a;
+  margin-bottom: 1rem;
 }
 
 .description {
   margin-top: 1rem;
   line-height: 1.6;
+}
+
+.description :deep(p) {
+  margin-bottom: 1rem;
+}
+
+.description :deep(strong) {
+  font-weight: bold;
 }
 
 .add-to-cart-button {

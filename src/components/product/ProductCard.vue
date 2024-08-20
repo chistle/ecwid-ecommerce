@@ -1,16 +1,17 @@
 <template>
-  <div class="product-card">
+  <div class="product-card" @click="navigateToProduct">
     <img :src="product.imageUrl" :alt="product.name" class="product-image" />
     <h3 class="product-name">{{ product.name }}</h3>
     <p class="product-price">{{ formatPrice(product.price) }}</p>
-    <button @click="addToCart" class="buy-button">Add to Cart</button>
+    <button @click.stop="addToCart" class="buy-button">Add to Cart</button>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { Product } from '@/services/productService';
-import { useCartStore } from '@/stores/cart';
+import { useRouter } from 'vue-router';
+import { Product } from '../../services/productService';
+import { useCartStore } from '../../stores/cart';
 
 export default defineComponent({
   name: 'ProductCard',
@@ -21,6 +22,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const router = useRouter();
     const cartStore = useCartStore();
 
     const formatPrice = (price: number): string => {
@@ -30,13 +32,19 @@ export default defineComponent({
       }).format(price);
     };
 
-    const addToCart = () => {
+    const addToCart = (event: Event) => {
+      event.stopPropagation();
       cartStore.addItem(props.product);
+    };
+
+    const navigateToProduct = () => {
+      router.push({ name: 'ProductDetail', params: { id: props.product.id } });
     };
 
     return {
       formatPrice,
       addToCart,
+      navigateToProduct,
     };
   },
 });
@@ -48,6 +56,12 @@ export default defineComponent({
   padding: 1rem;
   margin: 1rem;
   text-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .product-image {

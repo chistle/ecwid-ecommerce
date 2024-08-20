@@ -6,6 +6,7 @@ export interface Product {
   price: number;
   imageUrl: string;
   description: string;
+  // Add other relevant fields
 }
 
 export interface ProductsResponse {
