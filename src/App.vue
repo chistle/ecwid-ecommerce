@@ -9,17 +9,29 @@
     <footer class="footer">
       <p>&copy; 2024 E-commerce Store. All rights reserved.</p>
     </footer>
+    <Alert
+      v-if="alertStore.isVisible"
+      :message="alertStore.message"
+      :type="alertStore.type"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import NavBar from './components/common/NavBar.vue';
+import Alert from './components/common/Alert.vue';
+import { useAlertStore } from './stores/alert';
 
 export default defineComponent({
   name: 'App',
   components: {
     NavBar,
+    Alert,
+  },
+  setup() {
+    const alertStore = useAlertStore();
+    return { alertStore };
   },
 });
 </script>

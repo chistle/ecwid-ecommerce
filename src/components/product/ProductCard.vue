@@ -12,6 +12,7 @@ import { defineComponent, PropType } from 'vue';
 import { useRouter } from 'vue-router';
 import { Product } from '../../services/productService';
 import { useCartStore } from '../../stores/cart';
+import { useAlertStore } from '../../stores/alert';
 
 export default defineComponent({
   name: 'ProductCard',
@@ -24,6 +25,7 @@ export default defineComponent({
   setup(props) {
     const router = useRouter();
     const cartStore = useCartStore();
+    const alertStore = useAlertStore();
 
     const formatPrice = (price: number): string => {
       return new Intl.NumberFormat('en-US', {
@@ -35,6 +37,7 @@ export default defineComponent({
     const addToCart = (event: Event) => {
       event.stopPropagation();
       cartStore.addItem(props.product);
+      alertStore.showAlert(`${props.product.name} added to cart`, 'success');
     };
 
     const navigateToProduct = () => {
