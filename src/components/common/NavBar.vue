@@ -1,14 +1,16 @@
 <template>
-  <nav class="nav-bar">
-    <router-link to="/" class="nav-logo">E-commerce Store</router-link>
-    <div class="nav-links">
-      <router-link to="/" class="nav-link">Home</router-link>
-      <router-link to="/cart" class="nav-link">
-        Cart
-        <span v-if="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
-      </router-link>
-    </div>
-  </nav>
+  <header class="sticky-header">
+    <nav class="nav-bar">
+      <router-link to="/" class="nav-logo">E-commerce Store</router-link>
+      <div class="nav-links">
+        <router-link to="/" class="nav-link">Home</router-link>
+        <router-link to="/cart" class="nav-link">
+          Cart
+          <span v-if="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
+        </router-link>
+      </div>
+    </nav>
+  </header>
 </template>
 
 <script lang="ts">
@@ -29,13 +31,21 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
 .nav-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .nav-logo {
