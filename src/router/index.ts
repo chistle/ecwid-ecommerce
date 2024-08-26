@@ -1,4 +1,3 @@
-// src/router/index.ts
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import ProductDetailView from '../views/ProductDetailView.vue';
@@ -8,6 +7,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
+    component: HomeView,
+  },
+  {
+    path: '/category/:id',
+    name: 'Category',
     component: HomeView,
   },
   {

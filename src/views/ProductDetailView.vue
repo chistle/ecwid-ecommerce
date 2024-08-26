@@ -1,20 +1,36 @@
 <template>
-  <div v-if="product" class="product-detail">
-    <img :src="product.imageUrl" :alt="product.name" class="product-image" />
-    <div class="product-info">
-      <h1>{{ product.name }}</h1>
-      <p class="price">{{ formatPrice(product.price) }}</p>
-      <div class="description" v-html="product.description"></div>
-      <button @click="addToCart" class="add-to-cart-button">Add to Cart</button>
+  <div class="product-detail">
+    <nav aria-label="Breadcrumb">
+      <ol class="breadcrumbs">
+        <li><router-link to="/">Home</router-link></li>
+        <li v-for="category in breadcrumbs" :key="category.id">
+          <router-link :to="{ name: 'Category', params: { id: category.id } }">
+            {{ category.name }}
+          </router-link>
+        </li>
+        <li v-if="product">{{ product.name }}</li>
+      </ol>
+    </nav>
+
+    <div v-if="loading" class="loading">Loading product details...</div>
+    <div v-else-if="product" class="product-content">
+      <img :src="product.imageUrl" :alt="product.name" class="product-image" />
+      <div class="product-info">
+        <h1>{{ product.name }}</h1>
+        <p class="price">{{ formatPrice(product.price) }}</p>
+        <div class="description" v-html="product.description"></div>
+        <button @click="addToCart" class="add-to-cart-button">Add to Cart</button>
+      </div>
     </div>
+    <div v-else class="error">Product not found</div>
   </div>
-  <div v-else class="loading">Loading product details...</div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { productService, Product } from '../services/productService';
+import { useCategoryStore } from '../stores/category';
 import { useCartStore } from '../stores/cart';
 
 export default defineComponent({
@@ -22,7 +38,9 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const product = ref<Product | null>(null);
+    const loading = ref(true);
     const cartStore = useCartStore();
+    const categoryStore = useCategoryStore();
 
     const loadProduct = async () => {
       const productId = Number(route.params.id);
@@ -30,8 +48,15 @@ export default defineComponent({
         product.value = await productService.getProduct(productId);
       } catch (error) {
         console.error('Failed to load product:', error);
+      } finally {
+        loading.value = false;
       }
     };
+
+    const breadcrumbs = computed(() => {
+      if (!product.value || !product.value.categoryIds) return [];
+      return categoryStore.getCategoryPath(product.value.categoryIds[0]);
+    });
 
     const formatPrice = (price: number): string => {
       return new Intl.NumberFormat('en-US', {
@@ -50,6 +75,8 @@ export default defineComponent({
 
     return {
       product,
+      loading,
+      breadcrumbs,
       formatPrice,
       addToCart,
     };
@@ -59,8 +86,26 @@ export default defineComponent({
 
 <style scoped>
 .product-detail {
-  display: flex;
   padding: 2rem;
+}
+
+.breadcrumbs {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.breadcrumbs li {
+  display: inline;
+}
+
+.breadcrumbs li:not(:last-child)::after {
+  content: ' > ';
+  margin: 0 0.5rem;
+}
+
+.product-content {
+  display: flex;
   gap: 2rem;
 }
 
@@ -77,20 +122,10 @@ export default defineComponent({
   font-size: 1.5rem;
   font-weight: bold;
   color: #4a4a4a;
-  margin-bottom: 1rem;
 }
 
 .description {
   margin-top: 1rem;
-  line-height: 1.6;
-}
-
-.description :deep(p) {
-  margin-bottom: 1rem;
-}
-
-.description :deep(strong) {
-  font-weight: bold;
 }
 
 .add-to-cart-button {
@@ -103,9 +138,10 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.loading {
+.loading, .error {
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
+  color: #666;
 }
 </style>

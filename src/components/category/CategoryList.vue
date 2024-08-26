@@ -1,49 +1,63 @@
 <template>
   <div class="category-list">
-    <div
-      v-for="category in categories"
-      :key="category.id"
-      class="category-item"
-      @click="$emit('selectCategory', category.id)"
-    >
-      <h3>{{ category.name }}</h3>
+    <div class="search-container">
+      <input
+        v-model="searchQuery"
+        placeholder="Search categories..."
+        @input="searchCategories"
+        aria-label="Search categories"
+      />
     </div>
+    <nav aria-label="Category navigation">
+      <category-tree :categories="filteredCategories" />
+    </nav>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { Category } from '@/services/categoryService';
+import { defineComponent, ref, computed, onMounted } from 'vue';
+import { useCategoryStore } from '@/stores/category';
+import CategoryTree from './CategoryTree.vue';
 
 export default defineComponent({
   name: 'CategoryList',
-  props: {
-    categories: {
-      type: Array as PropType<Category[]>,
-      required: true,
-    },
+  components: { CategoryTree },
+  setup() {
+    const categoryStore = useCategoryStore();
+    const searchQuery = ref('');
+
+    const filteredCategories = computed(() => {
+      return categoryStore.searchCategories(searchQuery.value);
+    });
+
+    const searchCategories = () => {
+      categoryStore.setSearchQuery(searchQuery.value);
+    };
+
+    onMounted(async () => {
+      await categoryStore.fetchCategories();
+    });
+
+    return { searchQuery, filteredCategories, searchCategories };
   },
-  emits: ['selectCategory'],
 });
 </script>
 
 <style scoped>
 .category-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.category-item {
-  background-color: #f0f0f0;
-  padding: 1rem;
+.search-container {
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.category-item:hover {
-  background-color: #e0e0e0;
 }
 </style>

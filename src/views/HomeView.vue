@@ -1,16 +1,22 @@
 <template>
   <div class="home">
     <h1>Welcome to Our Store</h1>
-    <CategoryList :categories="categories" @selectCategory="loadProducts" />
-    <ProductList :products="products" />
+    <div class="content">
+      <aside class="sidebar">
+        <CategoryList @selectCategory="loadProducts" />
+      </aside>
+      <main class="main-content">
+        <ProductList :products="products" />
+      </main>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import CategoryList from '../components/category/CategoryList.vue';
 import ProductList from '../components/product/ProductList.vue';
-import { categoryService, Category } from '../services/categoryService';
+import { useCategoryStore } from '../stores/category';
 import { productService, Product } from '../services/productService';
 
 export default defineComponent({
@@ -20,17 +26,8 @@ export default defineComponent({
     ProductList,
   },
   setup() {
-    const categories = ref<Category[]>([]);
+    const categoryStore = useCategoryStore();
     const products = ref<Product[]>([]);
-
-    const loadCategories = async () => {
-      try {
-        const response = await categoryService.getCategories();
-        categories.value = response.items;
-      } catch (error) {
-        console.error('Failed to load categories:', error);
-      }
-    };
 
     const loadProducts = async (categoryId?: number) => {
       try {
@@ -44,16 +41,31 @@ export default defineComponent({
       }
     };
 
-    onMounted(() => {
-      loadCategories();
-      loadProducts();
+    onMounted(async () => {
+      await categoryStore.fetchCategories();
+      await loadProducts();
     });
 
     return {
-      categories,
       products,
       loadProducts,
     };
   },
 });
 </script>
+
+<style scoped>
+.content {
+  display: flex;
+  gap: 2rem;
+}
+
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.main-content {
+  flex-grow: 1;
+}
+</style>
