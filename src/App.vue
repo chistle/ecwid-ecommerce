@@ -11,7 +11,13 @@
     <footer class="footer">
       <p>&copy; {{ currentYear }} E-commerce Store. All rights reserved.</p>
     </footer>
-    <Alert v-if="alertStore.isVisible" :message="alertStore.message" :type="alertStore.type" />
+    <Alert
+    v-if="alertStore.isVisible"
+    :message="alertStore.message"
+    :type="alertStore.type"
+    :duration="5000"
+    @close="alertStore.hideAlert"
+  />
   </div>
 </template>
 

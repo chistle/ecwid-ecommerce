@@ -17,10 +17,9 @@ export const useAlertStore = defineStore('alert', {
       this.message = message;
       this.type = type;
       this.isVisible = true;
-
-      setTimeout(() => {
-        this.isVisible = false;
-      }, 3000);
+    },
+    hideAlert() {
+      this.isVisible = false;
     },
   },
 });
