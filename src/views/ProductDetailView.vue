@@ -14,7 +14,9 @@
 
     <div v-if="loading" class="loading">Loading product details...</div>
     <div v-else-if="product" class="product-content">
-      <img :src="product.imageUrl" :alt="product.name" class="product-image" />
+      <div class="product-image-container">
+        <img :src="product.imageUrl" :alt="product.name" class="product-image" />
+      </div>
       <div class="product-info">
         <h1>{{ product.name }}</h1>
         <p class="price">{{ formatPrice(product.price) }}</p>
@@ -106,12 +108,20 @@ export default defineComponent({
 
 .product-content {
   display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
+.product-image-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 .product-image {
-  max-width: 50%;
+  width: 100%;
   height: auto;
+  object-fit: contain;
 }
 
 .product-info {
@@ -143,5 +153,20 @@ export default defineComponent({
   padding: 2rem;
   font-size: 1.2rem;
   color: #666;
+}
+
+@media (min-width: 768px) {
+  .product-content {
+    flex-direction: row;
+  }
+
+  .product-image-container {
+    flex: 1;
+    max-width: 50%;
+  }
+
+  .product-info {
+    flex: 1;
+  }
 }
 </style>
