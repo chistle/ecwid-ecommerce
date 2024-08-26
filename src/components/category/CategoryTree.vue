@@ -1,7 +1,7 @@
 <template>
   <ul class="category-tree" role="tree">
     <li
-      v-for="(category, index) in categories"
+      v-for="category in categories"
       :key="category.id"
       class="category-item"
       role="treeitem"
@@ -11,7 +11,7 @@
         :category="category"
         :is-expanded="expandedCategories.includes(category.id)"
         @toggle="toggleCategory(category)"
-        @keydown="handleKeyDown($event, index, category)"
+        @keydown="handleKeyDown($event, category)"
         tabindex="0"
       />
       <suspense v-if="expandedCategories.includes(category.id)">
@@ -32,6 +32,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { Category } from '@/types';
 import CategoryCard from './CategoryCard.vue';
 import { defineAsyncComponent } from 'vue';
@@ -49,7 +50,8 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+  setup(props) {
+    const router = useRouter();
     const expandedCategories = ref<number[]>([]);
 
     const toggleCategory = (category: Category) => {
@@ -59,10 +61,14 @@ export default defineComponent({
       } else {
         expandedCategories.value.splice(index, 1);
       }
+      router.push({ name: 'Category', params: { id: category.id } });
     };
 
-    const handleKeyDown = (event: KeyboardEvent, index: number, category: Category) => {
-      // ... (keep the existing keyboard navigation logic)
+    const handleKeyDown = (event: KeyboardEvent, category: Category) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleCategory(category);
+      }
     };
 
     return { expandedCategories, toggleCategory, handleKeyDown };
@@ -71,7 +77,18 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* ... (keep existing styles) */
+.category-tree {
+  list-style-type: none;
+  padding-left: 1rem;
+}
+
+.category-item {
+  margin-bottom: 0.5rem;
+}
+
+.subcategories {
+  margin-left: 1rem;
+}
 
 .loading {
   padding: 0.5rem;

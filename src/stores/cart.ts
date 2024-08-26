@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import { Product } from '../services/productService';
 
-interface CartItem extends Product {
-  quantity: number;
-}
-
 export const useCartStore = defineStore('cart', {
-  state: () => ({
-    items: [] as CartItem[],
+  state: (): CartState => ({
+    items: [],
   }),
   getters: {
     totalItems: (state) => state.items.reduce((total, item) => total + item.quantity, 0),
@@ -30,6 +26,15 @@ export const useCartStore = defineStore('cart', {
     },
     clearCart() {
       this.items = [];
+    },
+    updateItemQuantity(productId: number, quantity: number) {
+      const item = this.items.find(item => item.id === productId);
+      if (item) {
+        item.quantity = Math.max(0, quantity);
+        if (item.quantity === 0) {
+          this.removeItem(productId);
+        }
+      }
     },
   },
 });

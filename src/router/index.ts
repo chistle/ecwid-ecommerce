@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import ProductDetailView from '../views/ProductDetailView.vue';
 import CartView from '../views/CartView.vue';
+import CategoryView from '../views/CategoryView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -12,7 +13,14 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/category/:id',
     name: 'Category',
-    component: HomeView,
+    component: CategoryView,
+    children: [
+      {
+        path: ':subId',
+        name: 'Subcategory',
+        component: CategoryView,
+      },
+    ],
   },
   {
     path: '/product/:id',

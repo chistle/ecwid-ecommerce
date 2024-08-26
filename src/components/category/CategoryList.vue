@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
-import { useCategoryStore } from '@/stores/category';
+import { useCategoryStore } from '../../stores/category';
 import CategoryTree from './CategoryTree.vue';
 
 export default defineComponent({

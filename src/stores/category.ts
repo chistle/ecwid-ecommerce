@@ -1,19 +1,36 @@
 import { defineStore } from 'pinia';
-import { Category } from '@/types';
-import { categoryService } from '@/services/categoryService';
+import { Category } from '../types/category';
+import { categoryService } from '../services/categoryService';
 
 interface CategoryState {
   categories: Category[];
+  categoryMap: Map<number, Category>;
   searchQuery: string;
 }
 
 export const useCategoryStore = defineStore('category', {
   state: (): CategoryState => ({
     categories: [],
+    categoryMap: new Map(),
     searchQuery: '',
   }),
   getters: {
-    flattenedCategories(): Category[] {
+    getCategoryById: (state) => (id: number) => state.categoryMap.get(id),
+    getCategoryPath: (state) => (id: number) => {
+      const path: Category[] = [];
+      let currentId = id;
+      while (currentId) {
+        const category = state.categoryMap.get(currentId);
+        if (category) {
+          path.unshift(category);
+          currentId = category.parentId;
+        } else {
+          break;
+        }
+      }
+      return path;
+    },
+    flattenedCategories: (state) => {
       const flatten = (categories: Category[]): Category[] => {
         return categories.reduce((acc, category) => {
           acc.push(category);
@@ -23,29 +40,15 @@ export const useCategoryStore = defineStore('category', {
           return acc;
         }, [] as Category[]);
       };
-      return flatten(this.categories);
+      return flatten(state.categories);
     },
-    searchCategories(): (query: string) => Category[] {
+    searchCategories: (state) => {
       return (query: string) => {
-        if (!query) return this.categories;
+        if (!query) return state.categories;
         const lowerQuery = query.toLowerCase();
-        return this.flattenedCategories.filter(category =>
+        return state.flattenedCategories.filter(category =>
           category.name.toLowerCase().includes(lowerQuery)
         );
-      };
-    },
-    getCategoryById(): (id: number) => Category | undefined {
-      return (id: number) => this.flattenedCategories.find(category => category.id === id);
-    },
-    getCategoryPath(): (id: number) => Category[] {
-      return (id: number) => {
-        const path: Category[] = [];
-        let currentCategory = this.getCategoryById(id);
-        while (currentCategory) {
-          path.unshift(currentCategory);
-          currentCategory = currentCategory.parentId ? this.getCategoryById(currentCategory.parentId) : undefined;
-        }
-        return path;
       };
     },
   },
@@ -53,18 +56,28 @@ export const useCategoryStore = defineStore('category', {
     async fetchCategories() {
       const response = await categoryService.getCategories();
       this.categories = response.items;
+      this.updateCategoryMap(this.categories);
+    },
+    async fetchCategoryById(id: number) {
+      if (this.categoryMap.has(id)) {
+        return this.categoryMap.get(id);
+      }
+      const category = await categoryService.getCategory(id);
+      this.categoryMap.set(id, category);
+      return category;
+    },
+    async fetchSubcategories(parentId: number) {
+      const subcategories = await categoryService.getSubcategories(parentId);
+      this.updateCategoryMap(subcategories);
+      return subcategories;
+    },
+    updateCategoryMap(categories: Category[]) {
+      categories.forEach(category => {
+        this.categoryMap.set(category.id, category);
+      });
     },
     setSearchQuery(query: string) {
       this.searchQuery = query;
-    },
-    async fetchSubcategories(parentId: number): Promise<Category[]> {
-      // Implement this method in your categoryService
-      const subcategories = await categoryService.getSubcategories(parentId);
-      const parentCategory = this.getCategoryById(parentId);
-      if (parentCategory) {
-        parentCategory.children = subcategories;
-      }
-      return subcategories;
     },
   },
 });

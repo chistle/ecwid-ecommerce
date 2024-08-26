@@ -7,13 +7,18 @@
         <div class="item-details">
           <h3>{{ item.name }}</h3>
           <p>Price: {{ formatPrice(item.price) }}</p>
-          <p>Quantity: {{ item.quantity }}</p>
+          <div class="quantity-control">
+            <button @click="decrementQuantity(item)" class="quantity-btn" aria-label="Decrease quantity">-</button>
+            <span>{{ item.quantity }}</span>
+            <button @click="incrementQuantity(item)" class="quantity-btn" aria-label="Increase quantity">+</button>
+          </div>
         </div>
         <button @click="removeItem(item.id)" class="remove-button">Remove</button>
       </div>
       <div class="cart-summary">
         <p>Total: {{ formatPrice(totalPrice) }}</p>
         <button @click="placeOrder" class="place-order-button">Place Order</button>
+        <button @click="clearCart" class="clear-cart-button">Clear Cart</button>
       </div>
     </div>
     <div v-else class="empty-cart">
@@ -45,6 +50,22 @@ export default defineComponent({
       cartStore.removeItem(productId);
     };
 
+    const clearCart = () => {
+      cartStore.clearCart();
+    };
+
+    const incrementQuantity = (item: CartItem) => {
+      cartStore.updateItemQuantity(item.id, item.quantity + 1);
+    };
+
+    const decrementQuantity = (item: CartItem) => {
+      if (item.quantity > 1) {
+        cartStore.updateItemQuantity(item.id, item.quantity - 1);
+      } else {
+        removeItem(item.id);
+      }
+    };
+
     const placeOrder = () => {
       // Here you would typically integrate with a payment gateway
       // and handle the order placement process
@@ -57,6 +78,9 @@ export default defineComponent({
       totalPrice,
       formatPrice,
       removeItem,
+      clearCart,
+      incrementQuantity,
+      decrementQuantity,
       placeOrder,
     };
   },
@@ -64,53 +88,42 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.cart-view {
-  padding: 2rem;
-}
+/* ... existing styles ... */
 
-.cart-item {
+.quantity-control {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
-  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.quantity-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  background-color: #f0f0f0;
   border: 1px solid #ddd;
-}
-
-.item-image {
-  width: 100px;
-  height: auto;
-  margin-right: 1rem;
-}
-
-.item-details {
-  flex: 1;
-}
-
-.remove-button {
-  padding: 0.5rem 1rem;
-  background-color: #ff4136;
-  color: white;
-  border: none;
   cursor: pointer;
 }
 
-.cart-summary {
-  margin-top: 2rem;
-  text-align: right;
+.quantity-control span {
+  margin: 0 0.5rem;
 }
 
-.place-order-button {
+.clear-cart-button {
+  margin-left: 1rem;
   padding: 0.5rem 1rem;
   font-size: 1rem;
-  background-color: #4CAF50;
+  background-color: #f44336;
   color: white;
   border: none;
   cursor: pointer;
 }
 
-.empty-cart {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #888;
+/* Add transitions for smooth animations */
+.cart-item {
+  transition: opacity 0.3s ease;
+}
+
+.cart-item.removing {
+  opacity: 0;
 }
 </style>

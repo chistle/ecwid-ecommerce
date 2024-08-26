@@ -2,7 +2,9 @@
   <div id="app">
     <NavBar />
     <main class="main-content">
-      <router-view></router-view>
+      <transition name="fade" mode="out-in">
+        <router-view></router-view>
+      </transition>
     </main>
     <footer class="footer">
       <p>&copy; 2024 E-commerce Store. All rights reserved.</p>
@@ -43,5 +45,15 @@ export default defineComponent({
   text-align: center;
   padding: 1rem;
   margin-top: auto;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
