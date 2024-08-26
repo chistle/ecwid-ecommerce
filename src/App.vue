@@ -2,23 +2,21 @@
   <div id="app">
     <NavBar />
     <main class="main-content">
-      <transition name="fade" mode="out-in">
-        <router-view></router-view>
-      </transition>
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
     <footer class="footer">
-      <p>&copy; 2024 E-commerce Store. All rights reserved.</p>
+      <p>&copy; {{ currentYear }} E-commerce Store. All rights reserved.</p>
     </footer>
-    <Alert
-      v-if="alertStore.isVisible"
-      :message="alertStore.message"
-      :type="alertStore.type"
-    />
+    <Alert v-if="alertStore.isVisible" :message="alertStore.message" :type="alertStore.type" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
 import NavBar from './components/common/NavBar.vue';
 import Alert from './components/common/Alert.vue';
 import { useAlertStore } from './stores/alert';
@@ -31,14 +29,16 @@ export default defineComponent({
   },
   setup() {
     const alertStore = useAlertStore();
-    return { alertStore };
+    const currentYear = computed(() => new Date().getFullYear());
+
+    return { alertStore, currentYear };
   },
 });
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
