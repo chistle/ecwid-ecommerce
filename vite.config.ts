@@ -9,5 +9,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  base: '/',
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @import "@/assets/styles/abstracts/_variables.scss";
+          @import "@/assets/styles/abstracts/_mixins.scss";
+        `
+      }
+    }
+  }
 })

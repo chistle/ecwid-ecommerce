@@ -50,44 +50,45 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss">
 .product-card {
   border: 1px solid #ddd;
   padding: 1rem;
   margin: 1rem;
   text-align: center;
-  cursor: pointer;
   transition: box-shadow 0.3s ease;
-}
 
-.product-card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+  @include respond-to(md) {
+    flex: 0 0 calc(50% - 2rem);
+  }
 
-.product-image {
-  max-width: 100%;
-  height: auto;
-}
+  @include respond-to(lg) {
+    flex: 0 0 calc(33.333% - 2rem);
+  }
 
-.product-name {
-  margin: 0.5rem 0;
-}
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
 
-.product-price {
-  font-weight: bold;
-  color: #4a4a4a;
-}
+  .product-image {
+    max-width: 100%;
+    height: auto;
+  }
 
-.buy-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
+  .product-name {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .product-price {
+    font-weight: bold;
+    color: $primary-color;
+  }
+
+  .buy-button {
+    @include button-style($primary-color);
+    margin-top: 1rem;
+  }
 }
 </style>
