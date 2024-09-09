@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, toRef } from 'vue';
 import { useRoute } from 'vue-router';
 import { productService, Product } from '../services/productService';
 import { useCategoryStore } from '../stores/category';
@@ -75,12 +75,19 @@ export default defineComponent({
 
     onMounted(loadProduct);
 
+    const productName = toRef(product, 'name');
+    const productPrice = toRef(product, 'price');
+    const productDescription = toRef(product, 'description');
+
     return {
       product,
       loading,
       breadcrumbs,
       formatPrice,
       addToCart,
+      productName,
+      productPrice,
+      productDescription,
     };
   },
 });

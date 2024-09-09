@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, toRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { Product } from '../../services/productService';
 import { useCartStore } from '../../stores/cart';
@@ -31,6 +31,10 @@ export default defineComponent({
     const cartStore = useCartStore();
     const alertStore = useAlertStore();
 
+    const productName = toRef(props.product, 'name');
+    const productId = toRef(props.product, 'id');
+    const productPrice = toRef(props.product, 'price');
+
     const formatPrice = (price: number): string => {
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -41,14 +45,16 @@ export default defineComponent({
     const addToCart = (event: Event) => {
       event.stopPropagation();
       cartStore.addItem(props.product);
-      alertStore.showAlert(`${props.product.name} added to cart`, 'success');
+      alertStore.showAlert(`${productName.value} added to cart`, 'success');
     };
 
     const navigateToProduct = () => {
-      router.push({ name: 'ProductDetail', params: { id: props.product.id } });
+      router.push({ name: 'ProductDetail', params: { id: productId.value } });
     };
 
     return {
+      productName,
+      productPrice,
       formatPrice,
       addToCart,
       navigateToProduct,

@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, toRef } from 'vue';
 import { useCartStore } from '@/stores/cart';
 
 export default defineComponent({
@@ -40,8 +40,8 @@ export default defineComponent({
   setup() {
     const cartStore = useCartStore();
 
-    const cartItems = computed(() => cartStore.items);
-    const totalPrice = computed(() => cartStore.totalPrice);
+    const cartItems = toRef(cartStore, 'items');
+    const totalPrice = toRef(cartStore, 'totalPrice');
 
     const formatPrice = (price: number): string => {
       return new Intl.NumberFormat('en-US', {
@@ -71,8 +71,6 @@ export default defineComponent({
     };
 
     const placeOrder = () => {
-      // Here you would typically integrate with a payment gateway
-      // and handle the order placement process
       alert('Thank you for your order!');
       cartStore.clearCart();
     };
